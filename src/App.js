@@ -9,6 +9,8 @@ export default function App() {
 
   const [inputValue, setInputValue] = useState('');
 
+
+  // adds into array
   function addIntoArray() {
     setToDoArray(prevState => ([inputValue, ...prevState]))
     setInputValue('');
