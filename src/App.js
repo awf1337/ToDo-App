@@ -1,4 +1,5 @@
 import React, {useState, useRef} from "react"
+import dndImage from "./images/bars-solid.svg"
 
 // number of items per page
 const PER_PAGE = 5;
@@ -9,36 +10,61 @@ export default function App() {
   const [inputValue, setInputValue] = useState('');
 
   const inputRef = useRef(null);
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+
+  function handleSort() {
+    let dublicateToDoArray = [...toDoArray];
+
+    // remove and save the dragged item
+    const draggedItemContent = dublicateToDoArray.splice(dragItem.current,1)[0];
+
+    //switch the position
+    dublicateToDoArray.splice(dragOverItem.current, 0, draggedItemContent)
+
+    //reset refs
+    dragItem.current = null;
+    dragOverItem.current = null;
+    setToDoArray(dublicateToDoArray);
+  }
 
   function addIntoArray(e) {
     //prevent refresh after form submit
-    e.preventDefault()
+    e.preventDefault();
 
-    setToDoArray(prevState => ([inputValue, ...prevState]))
+    setToDoArray(prevState => ([inputValue, ...prevState]));
     //clear the input field after submit
     setInputValue('');
 
     //focus the input field after submit
-    inputRef.current.focus()
+    inputRef.current.focus();
   }
 
   function deleteItem(indexElement) {
     //deep copy of toDoArray array 
-    const updatedArrayList = JSON.parse(JSON.stringify(toDoArray))
+    const updatedArrayList = JSON.parse(JSON.stringify(toDoArray));
 
     //remove indexElement item from array
-    updatedArrayList.splice(indexElement,1)
-    setToDoArray(updatedArrayList)
+    updatedArrayList.splice(indexElement,1);
+    setToDoArray(updatedArrayList);
   }
 
 
   const toDoList = toDoArray.map((toDoElement,indexElement) => {
         return (
-              <div className="todo_Content" key={indexElement}>
-                <div className="todo_Items">
+              <div className={`todo_LineContent Color${ indexElement % 2 === 0 && "Grey" }`} key={indexElement}>
+                  <img 
+                  src={dndImage} 
+                  alt="" 
+                  className="dndImage"
+                  draggable
+                  onDragStart={() => dragItem.current = indexElement}
+                  onDragEnter={() => dragOverItem.current = indexElement}
+                  onDragEnd={handleSort}
+                  onDragOver={(e) => e.preventDefault()}
+                  />
                   <li> {toDoElement} </li>
-                </div>
-                <span className="todo_DeleteItem" onClick={() => deleteItem(indexElement)}>X</span>
+                  <span className="todo_DeleteItem" onClick={() => deleteItem(indexElement)}>X</span>
               </div>
         )
   })
@@ -56,7 +82,7 @@ export default function App() {
           {toDoArray.length > 5 &&
             <div className="todo_Pages">
               {[...Array(parseInt(toDoArray.length/5) + 1)].map((_ , i) => (
-                <span onClick={() => setPage(i)}>{i+1}</span> 
+                <span key={i}onClick={() => setPage(i)}>{i+1}</span> 
               ))}
             </div>
           }
