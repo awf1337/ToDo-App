@@ -17,16 +17,6 @@ h1 {
     margin-top: 0;
 }
 
-p {
-    margin: 0 0 .5em; 
-}
-
-a {
-    padding-left: 10px;
-    cursor: pointer;
-}
-
-
 /*  Layout  */
 .main_Container {
     max-width: 600px;
@@ -59,7 +49,13 @@ a {
     align-self: center;
 }
 
-.pageSelection {
-    text-align: bottom;
+.todo_Items {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
 }
 
+.todo_Pages span {
+    padding-left: .5em;
+    cursor: pointer;
+}
