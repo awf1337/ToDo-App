@@ -1,5 +1,6 @@
-import React, {useState, useRef} from "react"
+import React, {useState, useRef, useEffect} from "react"
 import dndImage from "./images/bars-solid.svg"
+import deleteImage from "./images/trash-can-solid.svg"
 
 // number of items per page
 const PER_PAGE = 5;
@@ -8,10 +9,15 @@ export default function App() {
   const [toDoArray, setToDoArray] = useState([]);
   const [page, setPage] = useState(0);
   const [inputValue, setInputValue] = useState('');
+  const [inputEditValue, setInputEditValue] = useState('');
+  const [editField,setEditField] = useState({index:-1,boolean:false})
+  const [onMouseOutClick,setOnMouseOutClick] = useState(false)
 
   const inputRef = useRef(null);
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
+
+console.log(onMouseOutClick)
 
   function handleSort() {
     let dublicateToDoArray = [...toDoArray];
@@ -25,6 +31,7 @@ export default function App() {
     //reset refs
     dragItem.current = null;
     dragOverItem.current = null;
+
     setToDoArray(dublicateToDoArray);
   }
 
@@ -38,6 +45,9 @@ export default function App() {
 
     //focus the input field after submit
     inputRef.current.focus();
+
+    // focus first page after add todo Item
+    setPage(0)
   }
 
   function deleteItem(indexElement) {
@@ -49,6 +59,48 @@ export default function App() {
     setToDoArray(updatedArrayList);
   }
 
+  //when remove last item from a page, focus page-1
+  useEffect(()=> {
+    if(toDoArray.length%PER_PAGE === 0){
+      setPage(prevState => prevState > 0 ? prevState-1 : prevState)
+    }
+  },[toDoArray])
+  
+  //open edit field on double click
+  function handleClick (event,indexElement) {
+    setInputEditValue(toDoArray[indexElement])
+    switch (event.detail) {
+      case 2:
+        setEditField(prevState => ({boolean:!prevState.boolean,index:indexElement}))
+        break;
+    }
+  }
+
+  //edit element and save it
+  function editItem (e,indexElement) {
+    setInputEditValue(e.target.value)
+
+    //save the edited item in ToDoArray
+    let dublicateArray = [...toDoArray]
+    dublicateArray.splice(indexElement,1,e.target.value)
+    setToDoArray(dublicateArray)
+  }
+
+  //listen to ENTER to close the edit input field
+  function listenToEnter(e) {
+    if (e.key === "Enter") {
+      setEditField(prevState => ({index:-1,boolean:!prevState.boolean}))
+      setInputEditValue("")
+    }
+  }
+
+  function listenToMouseClick(e) {
+    if(onMouseOutClick === true){
+      setEditField(prevState => ({index:-1,boolean:!prevState.boolean}))
+      setInputEditValue("")
+      setOnMouseOutClick(false)
+    }
+  }
 
   const toDoList = toDoArray.map((toDoElement,indexElement) => {
         return (
@@ -63,14 +115,29 @@ export default function App() {
                   onDragEnd={handleSort}
                   onDragOver={(e) => e.preventDefault()}
                   />
-                  <li> {toDoElement} </li>
-                  <span className="todo_DeleteItem" onClick={() => deleteItem(indexElement)}>X</span>
+
+                  {editField.index === indexElement && editField.boolean === false
+                  ?
+                  <input 
+                  value={inputEditValue} 
+                  onMouseOut={() => setOnMouseOutClick(true)}
+                  onKeyUp={(e) => listenToEnter(e)} 
+                  onChange={(e)=> editItem(e,indexElement)}/> 
+                  :
+                  <p className="toDoElement" onClick={(event) => handleClick(event,indexElement)}> {toDoElement} </p>}
+                  
+                  <img 
+                  onClick={() => deleteItem(indexElement)} 
+                  src={deleteImage}
+                  alt=""
+                  className="deleteImage"
+                  />
               </div>
         )
   })
 
   return (
-      <div className="main_Container">
+      <div className="main_Container" onMouseDown={(e) => listenToMouseClick(e)}>
 
         <div>
           <h1>You have {toDoArray.length} Todos</h1>
@@ -79,10 +146,11 @@ export default function App() {
             {toDoList.slice(page * PER_PAGE, (page + 1) * PER_PAGE)}
           </ul> 
 
-          {toDoArray.length > 5 &&
+          {toDoArray.length > PER_PAGE &&
             <div className="todo_Pages">
-              {[...Array(parseInt(toDoArray.length/5) + 1)].map((_ , i) => (
-                <span key={i}onClick={() => setPage(i)}>{i+1}</span> 
+              {[...Array(Math.floor(toDoArray.length%PER_PAGE === 0
+              ? (toDoArray.length/PER_PAGE) : (toDoArray.length/PER_PAGE + 1)))].map((_ , i) => (
+                <span key={i} onClick={() => setPage(i)}>{i+1}</span> 
               ))}
             </div>
           }
@@ -90,7 +158,7 @@ export default function App() {
         
         <form>
             <input value={inputValue} onChange={(e) => setInputValue(e.target.value)} ref={inputRef}/>
-            <button className="todo_Button" onClick={addIntoArray}>Submit</button>
+            <button className="todo_Button" onClick={addIntoArray} disabled={inputValue ? false : true}>Submit</button>
         </form>
 
       </div>

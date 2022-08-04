@@ -8,8 +8,10 @@ body {
 
 /* Typography */
 
-li {
-    font-size: 1.5rem;
+.toDoElement {
+    margin: 0;
+    font-size: 1.6rem;
+    cursor: pointer;
 }
 
 h1 {
@@ -57,11 +59,17 @@ h1 {
 img.dndImage {
     max-width: 16px;
     cursor: move;
+    margin-left: 10px;
 }
+
 img.dndImage:active {
     cursor:grabbing;
 }
 
+img.deleteImage {
+    max-width: 15px;
+    cursor: pointer;
+}
 .todo_DeleteItem {
     cursor: pointer;
     align-self: center;
