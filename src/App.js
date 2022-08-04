@@ -17,8 +17,6 @@ export default function App() {
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
 
-console.log(onMouseOutClick)
-
   function handleSort() {
     let dublicateToDoArray = [...toDoArray];
 
@@ -157,7 +155,12 @@ console.log(onMouseOutClick)
         </div>
         
         <form>
-            <input value={inputValue} onChange={(e) => setInputValue(e.target.value)} ref={inputRef}/>
+            <input 
+            value={inputValue} 
+            onChange={(e) => setInputValue(e.target.value)} 
+            placeholder="Double click item to edit"
+            ref={inputRef}
+            />
             <button className="todo_Button" onClick={addIntoArray} disabled={inputValue ? false : true}>Submit</button>
         </form>
 
