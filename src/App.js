@@ -11,11 +11,22 @@ export default function App() {
   const [inputValue, setInputValue] = useState('');
   const [inputEditValue, setInputEditValue] = useState('');
   const [editField, setEditField] = useState(null)
-  const [onMouseOutClick, setOnMouseOutClick] = useState(false)
 
   const inputRef = useRef(null);
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
+
+  useEffect(() => {
+    document.addEventListener('click', () => {
+      setEditField(null);
+    });
+
+    return () => {
+      document.removeEventListener('click', () => {
+        setEditField(null);
+      });
+    }
+  }, []);
 
   function handleSort() {
     let dublicateToDoArray = [...toDoArray];
@@ -65,11 +76,10 @@ export default function App() {
 
   //open edit field on double click
   function handleClick(event, indexElement) {
-    setInputEditValue(toDoArray[indexElement])
-    switch (event.detail) {
-      case 2:
-        setEditField(indexElement)
-        break;
+    if (event.detail === 2) {
+      event.nativeEvent.stopImmediatePropagation();
+      setInputEditValue(toDoArray[indexElement]);
+      setEditField(indexElement);
     }
   }
 
@@ -88,15 +98,6 @@ export default function App() {
     if (e.key === "Enter") {
       setEditField(null)
       setInputEditValue("")
-    }
-  }
-
-  //listen to Click outside of field to close the edit input field
-  function listenToMouseClick() {
-    if (onMouseOutClick === true) {
-      setEditField(null)
-      setInputEditValue("")
-      setOnMouseOutClick(false)
     }
   }
 
@@ -121,9 +122,9 @@ export default function App() {
           ?
           <input
             value={inputEditValue}
-            onMouseOut={() => setOnMouseOutClick(true)}
             onKeyUp={(e) => listenToEnter(e)}
-            onChange={(e) => editItem(e, indexElement)} />
+            onChange={(e) => editItem(e, indexElement)}
+            onClick={(e) => { e.nativeEvent.stopImmediatePropagation(); }} />
           :
           <p className="toDoElement" onClick={(event) => handleClick(event, indexElement)}> {toDoElement} </p>}
 
@@ -138,7 +139,7 @@ export default function App() {
   })
 
   return (
-    <div className="main_Container" onMouseDown={() => listenToMouseClick()}>
+    <div className="main_Container">
 
       <div className="mainContent_Layout">
         <h1>You have {toDoArray.length} Todos</h1>
