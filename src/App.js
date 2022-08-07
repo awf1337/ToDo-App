@@ -10,7 +10,7 @@ export default function App() {
   const [page, setPage] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [inputEditValue, setInputEditValue] = useState('');
-  const [editField,setEditField] = useState({index:-1,boolean:false})
+  const [editField,setEditField] = useState({index:NaN,boolean:false})
   const [onMouseOutClick,setOnMouseOutClick] = useState(false)
 
   const inputRef = useRef(null);
@@ -49,8 +49,7 @@ export default function App() {
   }
 
   function deleteItem(indexElement) {
-    //deep copy of toDoArray array 
-    const updatedArrayList = JSON.parse(JSON.stringify(toDoArray));
+    const updatedArrayList = [...toDoArray];
 
     //remove indexElement item from array
     updatedArrayList.splice(indexElement,1);
@@ -78,7 +77,7 @@ export default function App() {
   function editItem (e,indexElement) {
     setInputEditValue(e.target.value)
 
-    //save the edited item in ToDoArray
+    //save the edited item in ToDoArray at same index
     let dublicateArray = [...toDoArray]
     dublicateArray.splice(indexElement,1,e.target.value)
     setToDoArray(dublicateArray)
@@ -87,14 +86,15 @@ export default function App() {
   //listen to ENTER to close the edit input field
   function listenToEnter(e) {
     if (e.key === "Enter") {
-      setEditField(prevState => ({index:-1,boolean:!prevState.boolean}))
+      setEditField(prevState => ({index:NaN, boolean:!prevState.boolean}))
       setInputEditValue("")
     }
   }
 
-  function listenToMouseClick(e) {
+  //listen to Click outside of field to close the edit input field
+  function listenToMouseClick() {
     if(onMouseOutClick === true){
-      setEditField(prevState => ({index:-1,boolean:!prevState.boolean}))
+      setEditField(prevState => ({index:NaN, boolean:!prevState.boolean}))
       setInputEditValue("")
       setOnMouseOutClick(false)
     }
@@ -102,14 +102,17 @@ export default function App() {
 
   const toDoList = toDoArray.map((toDoElement,indexElement) => {
         return (
-              <div className={`todo_LineContent Color${ indexElement % 2 === 0 && "Grey" }`} key={indexElement}>
+              <div 
+              key={indexElement}
+              className={`todo_LineContent Color${ indexElement % 2 === 0 && "Grey" }`}
+              onDragEnter={() => dragOverItem.current = indexElement}
+              >
                   <img 
                   src={dndImage} 
                   alt="" 
                   className="dndImage"
                   draggable
                   onDragStart={() => dragItem.current = indexElement}
-                  onDragEnter={() => dragOverItem.current = indexElement}
                   onDragEnd={handleSort}
                   onDragOver={(e) => e.preventDefault()}
                   />
@@ -135,9 +138,9 @@ export default function App() {
   })
 
   return (
-      <div className="main_Container" onMouseDown={(e) => listenToMouseClick(e)}>
+      <div className="main_Container" onMouseDown={() => listenToMouseClick()}>
 
-        <div>
+        <div className="mainContent_Layout">
           <h1>You have {toDoArray.length} Todos</h1>
 
           <ul className="todo_List">
@@ -161,7 +164,10 @@ export default function App() {
             placeholder="Double click item to edit"
             ref={inputRef}
             />
-            <button className="todo_Button" onClick={addIntoArray} disabled={inputValue ? false : true}>Submit</button>
+            <button 
+            className="todo_Button" 
+            onClick={addIntoArray} 
+            disabled={inputValue && inputValue !== " " ? false : true}>Submit</button>
         </form>
 
       </div>
