@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react"
-import dndImage from "./images/bars-solid.svg"
-import deleteImage from "./images/trash-can-solid.svg"
+import ToDoList from "./Components/ToDoList"
 
 // number of items per page
 const PER_PAGE = 5;
@@ -16,30 +15,24 @@ export default function App() {
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
 
+  //when remove last item from a page, focus page-1
   useEffect(() => {
-    document.addEventListener('click', () => {
-      setEditField(null);
-    });
-
-    return () => {
-      document.removeEventListener('click', () => {
-        setEditField(null);
-      });
+    if (toDoArray.length % PER_PAGE === 0) {
+      setPage(prevState => prevState > 0 ? prevState - 1 : prevState)
     }
-  }, []);
+  }, [toDoArray])
 
   function handleSort() {
     let dublicateToDoArray = [...toDoArray];
-
+  
     // remove and save the dragged item
-    const draggedItemContent = dublicateToDoArray.splice(dragItem.current, 1)[0];
-
+    const draggedItemContent = dublicateToDoArray.splice(dragItem.target, 1)[0];
+  
     //switch the position
-    dublicateToDoArray.splice(dragOverItem.current, 0, draggedItemContent)
-
-    //reset refs
-    dragItem.current = null;
-    dragOverItem.current = null;
+    dublicateToDoArray.splice(dragOverItem.target, 0, draggedItemContent)
+  
+    dragItem.target = null;
+    dragOverItem.target = null;
 
     setToDoArray(dublicateToDoArray);
   }
@@ -67,13 +60,6 @@ export default function App() {
     setToDoArray(updatedArrayList);
   }
 
-  //when remove last item from a page, focus page-1
-  useEffect(() => {
-    if (toDoArray.length % PER_PAGE === 0) {
-      setPage(prevState => prevState > 0 ? prevState - 1 : prevState)
-    }
-  }, [toDoArray])
-
   //open edit field on double click
   function handleClick(event, indexElement) {
     if (event.detail === 2) {
@@ -97,46 +83,21 @@ export default function App() {
   function listenToEnter(e) {
     if (e.key === "Enter") {
       setEditField(null)
-      setInputEditValue("")
     }
   }
 
-  const toDoList = toDoArray.map((toDoElement, indexElement) => {
-    return (
-      <div
-        key={indexElement}
-        className={`todo_LineContent Color${indexElement % 2 === 0 && "Grey"}`}
-        onDragEnter={() => dragOverItem.current = indexElement}
-      >
-        <img
-          src={dndImage}
-          alt=""
-          className="dndImage"
-          draggable
-          onDragStart={(e) => dragItem.current = indexElement}
-          onDragEnd={handleSort}
-          onDragOver={(e) => e.preventDefault()}
-        />
+  //when click anywhere outside set EditField to null
+  useEffect(() => {
+    document.addEventListener('click', () => {
+      setEditField(null);
+    });
 
-        {editField === indexElement
-          ?
-          <input
-            value={inputEditValue}
-            onKeyUp={(e) => listenToEnter(e)}
-            onChange={(e) => editItem(e, indexElement)}
-            onClick={(e) => { e.nativeEvent.stopImmediatePropagation(); }} />
-          :
-          <p className="toDoElement" onClick={(event) => handleClick(event, indexElement)}> {toDoElement} </p>}
-
-        <img
-          onClick={() => deleteItem(indexElement)}
-          src={deleteImage}
-          alt=""
-          className="deleteImage"
-        />
-      </div>
-    )
-  })
+    return () => {
+      document.removeEventListener('click', () => {
+        setEditField(null);
+      });
+    }
+  }, []);
 
   return (
     <div className="main_Container">
@@ -145,7 +106,24 @@ export default function App() {
         <h1>You have {toDoArray.length} Todos</h1>
 
         <ul className="todo_List">
-          {toDoList.slice(page * PER_PAGE, (page + 1) * PER_PAGE)}
+          {toDoArray.slice(page * PER_PAGE, (page + 1) * PER_PAGE).map((toDoElement, indexElement) => {
+              return (
+                <ToDoList 
+                  key={indexElement}
+                  id={indexElement}
+                  dragOverItem1={(e) => dragOverItem.target = e}
+                  dragItem1={(e) => dragItem.target = e}
+                  toDoElement={toDoElement}
+                  handleClick={(event) => handleClick(event, indexElement)}
+                  editField={editField}
+                  inputEditValue={inputEditValue}
+                  listenToEnter={(e) => listenToEnter(e)}
+                  editItem={(e) => editItem(e,indexElement)}
+                  deleteItem={() => deleteItem(indexElement)}
+                  handleSort={() => handleSort()}
+                />
+              )})
+          }
         </ul>
 
         {toDoArray.length > PER_PAGE &&
