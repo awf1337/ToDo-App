@@ -68,7 +68,7 @@ export default function App() {
       setEditField(indexElement);
     }
   }
-
+ 
   //edit element and save it
   function editItem(e, indexElement) {
     setInputEditValue(e.target.value)
