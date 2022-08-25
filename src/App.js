@@ -70,7 +70,7 @@ export default function App() {
   //edit element and save it
   function editItem(e, indexElement) {
     setInputEditValue(e.target.value)
-
+    console.log(indexElement)
     //save the edited item in ToDoArray at same index
     let dublicateArray = [...toDoArray]
     dublicateArray.splice(indexElement, 1, e.target.value)
@@ -134,19 +134,20 @@ export default function App() {
         
         <ul className="todo_List">
           {toDoArray.slice(page * itemsPerPage, (page + 1) * itemsPerPage).map((toDoElement, indexElement) => {
+              const indexElementToDoArray = indexElement+itemsPerPage*page;
               return (
                 <ToDoList 
-                  key={indexElement}
-                  id={indexElement}
+                  key={indexElementToDoArray}
+                  id={indexElementToDoArray}
                   dragOverItem1={(e) => dragOverItem.target = e}
                   dragItem1={(e) => dragItem.target = e}
                   toDoElement={toDoElement}
-                  handleClick={(event) => handleClick(event, indexElement)}
+                  handleClick={(event) => handleClick(event, indexElementToDoArray)}
                   editField={editField}
                   inputEditValue={inputEditValue}
                   listenToEnter={(e) => listenToEnter(e)}
-                  editItem={(e) => editItem(e,indexElement)}
-                  deleteItem={() => deleteItem(indexElement)}
+                  editItem={(e) => editItem(e,indexElementToDoArray)}
+                  deleteItem={() => deleteItem(indexElementToDoArray)}
                   handleSort={() => handleSort()}
                 />
               )})
