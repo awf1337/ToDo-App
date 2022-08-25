@@ -23,7 +23,7 @@ export default function toDoList(props) {
           {props.editField === props.id
             ?
             <input
-              style={{"textAlign": "center"}}
+              style={{"textAlign": "center", "backgroundColor" : "rgb(255, 255, 255, 0.8)", "border" : "none"}}
               value={props.inputEditValue}
               onKeyUp={(e) => props.listenToEnter(e)}
               onChange={(e) => props.editItem(e)}
