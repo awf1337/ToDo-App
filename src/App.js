@@ -1,15 +1,13 @@
 import React, { useState, useRef, useEffect } from "react"
 import ToDoList from "./Components/ToDoList"
 
-// number of items per page
-const PER_PAGE = 5;
-
 export default function App() {
   const [toDoArray, setToDoArray] = useState([]);
   const [page, setPage] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [inputEditValue, setInputEditValue] = useState('');
-  const [editField, setEditField] = useState(null)
+  const [editField, setEditField] = useState(null);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const inputRef = useRef(null);
   const dragItem = useRef(null);
@@ -17,7 +15,7 @@ export default function App() {
 
   //when remove last item from a page, focus page-1
   useEffect(() => {
-    if (toDoArray.length % PER_PAGE === 0) {
+    if (toDoArray.length % itemsPerPage === 0) {
       setPage(prevState => prevState > 0 ? prevState - 1 : prevState)
     }
   }, [toDoArray])
@@ -100,13 +98,42 @@ export default function App() {
   }, []);
 
   return (
-    <div className="main_Container">
+    <div className="main_Container"
+    style={{"height" : `${330*itemsPerPage/5-160}px`}}
+    >
 
       <div className="mainContent_Layout">
         <h1>You have {toDoArray.length} Todos</h1>
 
+        <div className="inputs_container">
+          <form>
+            <input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Double click item to edit"
+              ref={inputRef}
+            />
+            <button
+              className="todo_Button"
+              onClick={addIntoArray}
+              disabled={inputValue && inputValue.match(/\S/) ? false : true}>Submit
+            </button>
+          </form>
+
+          <select 
+            className="selectField"
+            onChange={(e) => {
+              setItemsPerPage(e.target.value)
+              setPage(0)}}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">50</option>
+          </select>
+        </div>
+        
         <ul className="todo_List">
-          {toDoArray.slice(page * PER_PAGE, (page + 1) * PER_PAGE).map((toDoElement, indexElement) => {
+          {toDoArray.slice(page * itemsPerPage, (page + 1) * itemsPerPage).map((toDoElement, indexElement) => {
               return (
                 <ToDoList 
                   key={indexElement}
@@ -126,29 +153,16 @@ export default function App() {
           }
         </ul>
 
-        {toDoArray.length > PER_PAGE &&
+        {toDoArray.length > itemsPerPage &&
           <div className="todo_Pages">
-            {[...Array(Math.floor(toDoArray.length % PER_PAGE === 0
-              ? (toDoArray.length / PER_PAGE) : (toDoArray.length / PER_PAGE + 1)))].map((_, i) => (
+            {[...Array(Math.floor(toDoArray.length % itemsPerPage === 0
+              ? (toDoArray.length / itemsPerPage) : (toDoArray.length / itemsPerPage + 1)))].map((_, i) => (
                 <span key={i} onClick={() => setPage(i)}>{i + 1}</span>
               ))}
           </div>
         }
+
       </div>
-
-      <form>
-        <input
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Double click item to edit"
-          ref={inputRef}
-        />
-        <button
-          className="todo_Button"
-          onClick={addIntoArray}
-          disabled={inputValue && inputValue.match(/\S/) ? false : true}>Submit</button>
-      </form>
-
     </div>
   )
 }

@@ -23,9 +23,10 @@ h1 {
 }
 
 /*  Layout  */
+
 .main_Container {
     max-width: 600px;
-    height: 330px;
+    min-height: 330px;
     background-color: rgb(215, 215, 215);
     margin: 0 auto;
     text-align: center;
@@ -42,6 +43,7 @@ h1 {
     list-style-type: none;
     padding: 0;
     flex-grow: 1;
+    margin-bottom: 0;
 }
 
 .todo_Button {
@@ -61,8 +63,15 @@ h1 {
 }
 
 .todo_Pages span {
-    padding-left: .5em;
+    border-radius: 50%;
+    padding: 0 .25em;
     cursor: pointer;
+    overflow: hidden;
+    transition: color .5s, font-size .5s;
+}
+
+.todo_Pages span:hover {
+    font-size: 20px;
 }
 
 .mainContent_Layout {
@@ -92,4 +101,17 @@ img.deleteImage {
     cursor: pointer;
     align-self: center;
     margin-right: 10px;
+}
+
+.selectField {
+    width: 40px;
+}
+
+.inputs_container {
+    display: flex;
+    justify-content: space-between
+}
+
+form {
+    flex-grow: 1;
 }

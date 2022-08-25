@@ -5,7 +5,7 @@ import React from "react";
 export default function toDoList(props) {
     
     return (
-        <div
+        <li
           key={props.id}
           className={`todo_LineContent Color${props.id % 2 === 0 && "Grey"}`}
           onDragEnter={() => props.dragOverItem1(props.id)}
@@ -23,6 +23,7 @@ export default function toDoList(props) {
           {props.editField === props.id
             ?
             <input
+              style={{"textAlign": "center"}}
               value={props.inputEditValue}
               onKeyUp={(e) => props.listenToEnter(e)}
               onChange={(e) => props.editItem(e)}
@@ -35,6 +36,6 @@ export default function toDoList(props) {
             alt=""
             className="deleteImage"
           />
-        </div>
+        </li>
       )  
 }
