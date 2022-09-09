@@ -13,7 +13,7 @@ export default function App() {
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
 
-  //when remove last item from a page, focus page-1
+  //when remove last item from a page, focus page-1 
   useEffect(() => {
     if (toDoArray.length % itemsPerPage === 0) {
       setPage(prevState => prevState > 0 ? prevState - 1 : prevState)
@@ -99,7 +99,7 @@ export default function App() {
 
   return (
     <div className="main_Container"
-    style={{"height" : `${330*itemsPerPage/5-160}px`}}
+    style={{"height" : `${itemsPerPage>21 ? 50*itemsPerPage : 50*itemsPerPage-180}px`}}
     >
 
       <div className="mainContent_Layout">
@@ -128,7 +128,7 @@ export default function App() {
           >
             <option value="5">5</option>
             <option value="10">10</option>
-            <option value="15">50</option>
+            <option value="20">20</option>
           </select>
         </div>
         
